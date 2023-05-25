@@ -4,6 +4,8 @@ open import Polynomial using (Polynomial)
 open import Data.Unit using (⊤)
 open import Data.Empty using (⊥)
 
+open import FAlgebra using (μ_)
+
 open Polynomial.Polynomial
 
 
