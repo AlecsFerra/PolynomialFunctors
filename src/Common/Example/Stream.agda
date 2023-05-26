@@ -1,14 +1,14 @@
 {-# OPTIONS --guardedness #-}
 
-module Example.Stream where
+module Common.Example.Stream where
 
-open import Polynomial using (Polynomial)
-open import FCoAlgebra using (ν_; ana)
+open import Common.Polynomial using (Polynomial)
+open import Common.FCoAlgebra using (ν_; ana)
 open import Data.Unit using (tt)
 open import Data.Product using (_,_; _×_; proj₁; proj₂)
 
 
-open Polynomial.Polynomial
+open Common.Polynomial.Polynomial
 open ν_
 
 StreamF : Set → Polynomial

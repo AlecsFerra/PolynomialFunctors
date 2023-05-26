@@ -7,10 +7,12 @@ open import Data.Product using (_×_; ∃-syntax; _,_)
 open import Relation.Binary.PropositionalEquality
     using (_≡_; refl; ≢-sym)
 open import Data.Nat
-  using (ℕ; suc; _<_; _≤_; _⊔_; _+_; s≤s; z≤n; _≟_; _≤?_)
+  using (ℕ; suc; _<_; _≤_; _⊔_; _+_; s≤s; z≤n; _≟_; _≤?_; _<?_)
 open import Data.Nat.Properties
   using (≤-reflexive; ≤-trans; ≤-step; n≤1+n; ≤∧≢⇒<; ≤-pred)
 open import Relation.Nullary using (¬_; yes; no)
+open import Relation.Nullary.Decidable
+  using (True; toWitness )
 
 private module ℕExtra where
   n≤n⊔m : {n m : ℕ} → n ≤ n ⊔ m
@@ -30,8 +32,8 @@ infixl 6 _⊕_
 infixl 7 _⊗_
 
 data Polynomial : ℕ → Set₁ where
-    I_  : {n : ℕ} → (m : ℕ) → {m < n} → Polynomial n
-    K_  : {n : ℕ} → Set → Polynomial n
+    I_  : {n : ℕ} → (m : ℕ) → {True (m <? n)} → Polynomial n
+    K_  : Set → Polynomial 0
     _⊗_ : {n m : ℕ} → Polynomial n → Polynomial m → Polynomial (n ⊔ m)
     _⊕_ : {n m : ℕ} → Polynomial n → Polynomial m → Polynomial (n ⊔ m)
     μ_  : {n : ℕ} → Polynomial (suc n) → Polynomial n
@@ -39,7 +41,7 @@ data Polynomial : ℕ → Set₁ where
 
 
 data Context : ℕ → Set₁ where
-  ∅   : Context 0
+  ∅      : Context 0
   _,[_]_ : {n m : ℕ} → Context n → (m ≤ n) → Polynomial m → Context (suc n)
 
 -- I i means to lookup the i-th position in the context from the context
@@ -57,15 +59,17 @@ lookup (ctx ,[ _   ] _) (suc m) {s≤s p} with lookup ctx m {p}
 -- B = I 0
 -- A ⊗ B
 weaken : ∀ {n m : ℕ} → (m ≤ n) → Context n → Context m
-weaken {0} {0} z≤z ∅ = ∅
-weaken {n} {m} m≤n ctx@(rest ,[ _ ] _) with n ≟ m
+weaken {0}     {0} z≤z ∅ = ∅
+weaken {suc n} {m} m≤n ctx@(rest ,[ _ ] _) with suc n ≟ m
 ... | yes refl = ctx
 ... | no  n≢m  = weaken (≤-pred (≤∧≢⇒< m≤n (≢-sym n≢m))) rest
 
+open import Data.Nat.Induction
+
 mutual
   eval : {n : ℕ} → Polynomial n → Context n → Set
-  eval ((I m) {m<n}) ctx with lookup ctx m {m<n}
-  ... | p , X , s≤s p<n = eval X (weaken (≤-trans p<n (n≤1+n _)) ctx)
+  eval ((I m) {m<n}) ctx with lookup ctx m {toWitness m<n}
+    ... | p , X , s≤s p<n  = eval X (weaken (≤-trans p<n (n≤1+n _)) ctx)
   eval (K x)         ctx = x
   eval (L ⊗ R)       ctx = eval L (weaken n≤n⊔m ctx) × eval R (weaken m≤n⊔m ctx)
   eval (L ⊕ R)       ctx = eval L (weaken n≤n⊔m ctx) ⊎ eval R (weaken m≤n⊔m ctx)
@@ -78,3 +82,18 @@ mutual
   record GreatestFixpoint {n : ℕ} (P : Polynomial (suc n)) (ctx : Context n) : Set where
     coinductive
     field rest : eval P (ctx ,[ ≤-reflexive refl ] (ν P))
+
+⟦_⟧ : ∀ {n m : ℕ} → {n≤m : True (n ≤? m)} → Polynomial n → Context m → Set
+⟦_⟧ {_} {_} {n≤m} F ctx = eval F (weaken (toWitness n≤m) ctx)
+
+private module List where
+  open import Data.Unit using (⊤)
+
+  ListF : Set → Polynomial 0
+  ListF X = μ (Step X)
+    where
+      Step : Set → Polynomial _
+      Step X = K ⊤ ⊕ K X ⊗ I 0
+
+  List : Set → Set
+  List X = ⟦ ListF X ⟧ ∅

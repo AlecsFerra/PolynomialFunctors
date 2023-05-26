@@ -1,12 +1,12 @@
 {-# OPTIONS --guardedness #-}
 
-module FCoAlgebra where
+module Common.FCoAlgebra where
 
-open import Polynomial using (Polynomial; ⟦_⟧)
+open import Common.Polynomial using (Polynomial; ⟦_⟧)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Product using (_,_)
 
-open Polynomial.Polynomial
+open Common.Polynomial.Polynomial
 
 record ν_ (F : Polynomial) : Set where
     coinductive

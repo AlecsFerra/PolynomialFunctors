@@ -1,12 +1,12 @@
-module Example.List where
+module Common.Example.List where
 
-open import Polynomial using (Polynomial)
-open import FAlgebra using (μ_; cata)
+open import Common.Polynomial using (Polynomial)
+open import Common.FAlgebra using (μ_; cata)
 open import Data.Unit using (⊤; tt)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Product using (_,_)
 
-open Polynomial.Polynomial
+open Common.Polynomial.Polynomial
 open μ_
 
 List : Set → Set

@@ -1,13 +1,10 @@
-module Derivative where
+module Common.Derivative where
 
-open import Polynomial using (Polynomial)
+open import Common.Polynomial using (Polynomial)
 open import Data.Unit using (⊤)
 open import Data.Empty using (⊥)
 
-open import FAlgebra using (μ_)
-
-open Polynomial.Polynomial
-
+open Common.Polynomial.Polynomial
 
 infixl 10 ∂_
 
