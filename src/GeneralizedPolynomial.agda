@@ -2,17 +2,17 @@
 
 module GeneralizedPolynomial where
 
-open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Data.Sum using (_⊎_)
 open import Data.Product using (_×_; ∃-syntax; _,_)
 open import Relation.Binary.PropositionalEquality
-    using (_≡_; refl; ≢-sym)
+    using (refl; ≢-sym)
 open import Data.Nat
-  using (ℕ; suc; _<_; _≤_; _⊔_; _+_; s≤s; z≤n; _≟_; _≤?_; _<?_)
+  using (ℕ; suc; _<_; _≤_; _⊔_; s≤s; z≤n; _≟_; _≤?_; _<?_)
 open import Data.Nat.Properties
   using (≤-reflexive; ≤-trans; ≤-step; n≤1+n; ≤∧≢⇒<; ≤-pred)
-open import Relation.Nullary using (¬_; yes; no)
+open import Relation.Nullary using (yes; no)
 open import Relation.Nullary.Decidable
-  using (True; toWitness )
+  using (True; toWitness)
 
 private module ℕExtra where
   n≤n⊔m : {n m : ℕ} → n ≤ n ⊔ m
@@ -69,7 +69,7 @@ open import Data.Nat.Induction
 mutual
   eval : {n : ℕ} → Polynomial n → Context n → Set
   eval ((I m) {m<n}) ctx with lookup ctx m {toWitness m<n}
-    ... | p , X , s≤s p<n  = eval X (weaken (≤-trans p<n (n≤1+n _)) ctx)
+  ... | p , X , s≤s p<n  = eval X (weaken (≤-trans p<n (n≤1+n _)) ctx)
   eval (K x)         ctx = x
   eval (L ⊗ R)       ctx = eval L (weaken n≤n⊔m ctx) × eval R (weaken m≤n⊔m ctx)
   eval (L ⊕ R)       ctx = eval L (weaken n≤n⊔m ctx) ⊎ eval R (weaken m≤n⊔m ctx)
