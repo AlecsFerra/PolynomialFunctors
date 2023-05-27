@@ -4,15 +4,16 @@ module GeneralizedPolynomial where
 
 open import Data.Sum using (_⊎_)
 open import Data.Product using (_×_; ∃-syntax; _,_)
-open import Relation.Binary.PropositionalEquality
-    using (refl; ≢-sym; _≡_)
 open import Data.Nat
   using (ℕ; suc; _<_; _≤_; _⊔_; s≤s; z≤n; _≟_; _≤?_; _<?_)
 open import Data.Nat.Properties
   using (≤-reflexive; ≤-trans; ≤-step; n≤1+n; ≤∧≢⇒<; ≤-pred; <⇒≤)
+open import Data.Nat.Induction using (<-rec)
 open import Relation.Nullary using (yes; no)
 open import Relation.Nullary.Decidable
   using (True; toWitness; fromWitness)
+open import Relation.Binary.PropositionalEquality
+    using (refl; ≢-sym; _≡_)
 
 private module ℕExtra where
   n≤n⊔m : {n m : ℕ} → n ≤ n ⊔ m
@@ -75,8 +76,6 @@ weaken-context {suc n} {m} m≤n ctx@(rest , _) with suc n ≟ m
 ... | yes refl = ctx
 ... | no  n≢m  = weaken-context (≤-pred (≤∧≢⇒< m≤n (≢-sym n≢m))) rest
 
-open import Data.Nat.Induction
-
 mutual
   eval-impl : _
   eval-impl 0       rec (K x)           ctx = x
@@ -93,16 +92,19 @@ mutual
   eval-impl n rec (L ⊕ᵣ R)              ctx = eval-impl _ rec L ctx ⊎ eval-impl _ rec R ctx
   eval-impl n rec (L ⊗ᵣ R)              ctx = eval-impl _ rec L ctx × eval-impl _ rec R ctx
 
-
-  eval : {n : ℕ} → Polynomial n → Context n → Set
-  eval {n} = <-rec _ eval-impl n
+  lemmaₙ : {n : ℕ} → True (n ≤? n)
+  lemmaₙ {n} = fromWitness (≤-reflexive refl)
 
   data LeastFixpoint {n : ℕ} (P : Polynomial (suc n)) (ctx : Context n) : Set where
-    μ⟨_⟩ : eval P (_,_ ctx {fromWitness (≤-reflexive refl)} (μ P)) → LeastFixpoint P ctx
+    μ⟨_⟩ : eval P (_,_ ctx {lemmaₙ} (μ P)) → LeastFixpoint P ctx
 
   record GreatestFixpoint {n : ℕ} (P : Polynomial (suc n)) (ctx : Context n) : Set where
     coinductive
-    field rest : eval P (_,_ ctx {fromWitness (≤-reflexive refl)} (ν P))
+    field rest : eval P (_,_ ctx {lemmaₙ} (ν P))
+
+
+  eval : {n : ℕ} → Polynomial n → Context n → Set
+  eval {n} = <-rec _ eval-impl n
 
 
 ⟦_⟧ : {n m : ℕ} → {n≤m : True (n ≤? m)} → Polynomial n → Context m → Set
