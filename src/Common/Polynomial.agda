@@ -1,4 +1,4 @@
-module Polynomial where
+module Common.Polynomial where
 
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (_×_; _,_)
@@ -9,26 +9,25 @@ open import Function using (_∘_; id)
 
 infixl 6 _⊕_
 infixl 7 _⊗_
-infixl 8 _⊙_
-
 
 data Polynomial : Set₁ where
     I    : Polynomial
     K    : Set → Polynomial
-    _⊗_ : Polynomial → Polynomial → Polynomial
-    _⊕_ : Polynomial → Polynomial → Polynomial
+    _⊗_  : Polynomial → Polynomial → Polynomial
+    _⊕_  : Polynomial → Polynomial → Polynomial
 
-_⊙_ : Polynomial → Polynomial → Polynomial
-I        ⊙ G = G
-K k      ⊙ G = K k
-(L ⊗ R) ⊙ G = L ⊙ G ⊗ R ⊙ G
-(L ⊕ R) ⊙ G = L ⊙ G ⊕ R ⊙ G
 
 ⟦_⟧ : Polynomial → Set → Set
 ⟦ I      ⟧ x = x
 ⟦ K k    ⟧ x = k
 ⟦ L ⊗ R ⟧ x = ⟦ L ⟧ x × ⟦ R ⟧ x
 ⟦ L ⊕ R ⟧ x = ⟦ L ⟧ x ⊎ ⟦ R ⟧ x
+
+_⊙_ : Polynomial → Polynomial → Polynomial
+I        ⊙ G = G
+K k      ⊙ G = K k
+(L ⊗ R) ⊙ G = L ⊙ G ⊗ R ⊙ G
+(L ⊕ R) ⊙ G = L ⊙ G ⊕ R ⊙ G
 
 ⟦F⊙G⟧≡⟦F⟧∙⟦G⟧ : (F G : Polynomial) → ⟦ F ⊙ G ⟧ ≡ ⟦ F ⟧ ∘ ⟦ G ⟧
 ⟦F⊙G⟧≡⟦F⟧∙⟦G⟧ I        G = refl
