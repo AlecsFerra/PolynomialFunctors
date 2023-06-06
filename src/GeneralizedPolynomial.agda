@@ -4,7 +4,7 @@ module GeneralizedPolynomial where
 
 open import Data.Empty using (⊥-elim; ⊥)
 open import Data.Unit using (⊤)
-open import Data.Sum using (_⊎_)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product
   using (_×_; ∃-syntax; _,_; proj₁; proj₂)
 open import Data.Nat
@@ -12,7 +12,7 @@ open import Data.Nat
         pred; _∸_; _+_)
 open import Data.Nat.Properties
   using (≤-reflexive; ≤-trans; ≤-step; n≤1+n; ≤∧≢⇒<; ≤-pred;
-        ≮⇒≥; m≤m⊔n; m≤n⊔m; m<n⇒m≤1+n)
+        ≮⇒≥; m≤m⊔n; m≤n⊔m; m<n⇒m≤1+n; m≤n⇒m<n∨m≡n)
 open import Data.Nat.Induction using (<-rec)
 
 open import Relation.Nullary using (yes; no; ¬_)
@@ -38,7 +38,10 @@ private module ℕextra where
   m≤n⇒m≤1+n z≤n       = z≤n
   m≤n⇒m≤1+n (s≤s m≤n) = s≤s (m≤n⇒m≤1+n m≤n)
 
-  postulate lemma : (n m : ℕ) → (n ≤ suc m) → ¬ (n ≡ suc m) → n ≤ m
+  lemma : (n m : ℕ) → (n ≤ suc m) → ¬ (n ≡ suc m) → n ≤ m
+  lemma m n n≤m n≢m with m≤n⇒m<n∨m≡n n≤m
+  ... | inj₁ n<m = ≤-pred n<m
+  ... | inj₂ n≡m = contradiction n≡m n≢m
 
 open ℕextra
 
