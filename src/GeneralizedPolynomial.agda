@@ -21,7 +21,7 @@ open import Relation.Nullary.Decidable
 open import Relation.Nullary.Negation
   using (contradiction)
 
-open import Relation.Binary.PropositionalEquality
+open import relation.binary.propositionalequality
     using (refl; ≢-sym; _≡_)
 
 infixl 6 _⊕ᵣ_

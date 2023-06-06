@@ -12,7 +12,7 @@ infixl 7 _⊗_
 
 data Polynomial : Set₁ where
     I    : Polynomial
-    K    : Set → Polynomial
+    K_   : Set → Polynomial
     _⊗_  : Polynomial → Polynomial → Polynomial
     _⊕_  : Polynomial → Polynomial → Polynomial
 
@@ -24,8 +24,8 @@ data Polynomial : Set₁ where
 ⟦ L ⊕ R ⟧ x = ⟦ L ⟧ x ⊎ ⟦ R ⟧ x
 
 _⊙_ : Polynomial → Polynomial → Polynomial
-I        ⊙ G = G
-K k      ⊙ G = K k
+I       ⊙ G = G
+(K k)   ⊙ G = K k
 (L ⊗ R) ⊙ G = L ⊙ G ⊗ R ⊙ G
 (L ⊕ R) ⊙ G = L ⊙ G ⊕ R ⊙ G
 
